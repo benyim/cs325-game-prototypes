@@ -22,7 +22,7 @@ window.onload = function() {
 
     function preload() {
 
-        game.load.audio('boden', ['assets/bodenstaendig_2000_in_rock_4bit.mp3', 'assets/bodenstaendig_2000_in_rock_4bit.ogg']);
+        game.load.audio('boden', ['assets/audio/bodenstaendig_2000_in_rock_4bit.mp3', 'assets/audio/bodenstaendig_2000_in_rock_4bit.ogg']);
 
         game.load.image('player', 'assets/player.png');
         game.load.image('bullet', 'assets/bullet.png');
