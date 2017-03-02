@@ -62,11 +62,13 @@ window.onload = function() {
 
     var livesString;
     var livesText;
-    var lives = 5;
+    var lives = 10;
 
     var trashString
     var trashText;
     var trashC = 0;
+
+    var stateText;
 
     //Sounds
     var pickup;
@@ -126,7 +128,11 @@ window.onload = function() {
         livesText = game.add.text(670, 10, livesString + lives, { font: '30px Arial', fill: '#fff' });
 
         trashString = 'Trash Collected : ';
-        trashText = game.add.text(650, 60, trashString + trashC, { font: '15px Arial', fill: '#fff' });
+        trashText = game.add.text(660, 60, trashString + trashC, { font: '15px Arial', fill: '#fff' });
+
+        stateText = game.add.text(400,200,' ', { font: '50px Arial', fill: '#fff' });
+        stateText.anchor.setTo(0.5, 0.5);
+        stateText.visible = false;
     }
 
     function setTrash(randX){
@@ -301,15 +307,32 @@ window.onload = function() {
                     trashLeft.play();
                 }
 
-                /*if(lives === 0){
+                if(lives === 0){
                     gameEnded = true;
-                    ret
-                }*/
+                    stateText.text=" The river became\ntoo contaminated! \n Click to try again";
+                    stateText.visible = true;
+                    var i;
+                    for(i = 0; i < trashCount; i++){
+                        //trashCount[i].destroy();
+                        trashSpots[i].destroy();
+                        trashAlive[i] = 0;
+                        moveTrash[i] = 0;
+                    }
+                    game.input.onTap.addOnce(restart,this);
+                }
             }
         }
     }
 
     function restart () {
+        gameEnded = false;
+        score = 0;
+        scoreText.text = scoreString + score;
+        lives = 10;
+        trashC = 0;
+        trashText.text = trashString + trashC;
+        livesText.text = livesString + lives;
+        stateText.visible = false;
         /*for(var x = 0; x < enemyCount; x++){
             enemyKilled[x] = 0;
         }
