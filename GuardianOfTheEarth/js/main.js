@@ -229,5 +229,4 @@ window.onload = function() {
         invader.animations.add('kaboom');
 
     }
-
 };
