@@ -10,6 +10,13 @@ window.onload = function() {
     // You will need to change the paths you pass to "game.load.image()" or any other
     // loading functions to reflect where you are putting the assets.
     // All loading functions will typically all be found inside "preload()".
+
+    //GOALS
+    // Show crads when clicked to give player a chance to memorize what was at that position
+    // Adding randomness to the game COMPLETED
+    // Restart state
+    // Not allow players to click on top of the screen twice COMPLETED
+    // fix issue where once a match is found, you can click on it and make a wrong move and it turns the card back over again
     
     "use strict";
     var width = 400;
@@ -18,10 +25,58 @@ window.onload = function() {
     var imageWidth = 50;
     var imageHeight = 50;
 
-    //sounds
+    //Sounds
     var music;
     var correct;
     var wrong;
+
+    var nose;
+    var recentClick = 0;
+    var totalClick = [0,0];
+    var firstPicked = false;
+    var secondPicked = false;
+    var temp2;
+    var gameEnded = false;
+    var matched = 0;
+
+    //Texts
+    var livesString;
+    var livesText;
+    var lives = 8;
+    var stateText;
+
+    // Image variables
+    var heart;
+    var heart2;
+    var bone;
+    var bone2;
+    var apple;
+    var apple2;
+    var icecream;
+    var icecream2;
+    var wishbone;
+    var wishbone2;
+    var ribs;
+    var ribs2;
+    var butterfly;
+    var butterfly2;
+    var pencil;
+    var pencil2;
+    var bread;
+    var bread2;
+    var horse;
+    var horse2;
+
+    var tempPic;
+
+    //background image
+    var operation;
+
+    var xRandom = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+    // exmaple xRandom
+    //  xRandom = [0,7,0,11,0,3,0,9,0,19,0,17,0,1,0,5,0,13,0,15]
+    //var yRandom = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
     var cardsClicked = 0; // keeps track of how many cards have been clicked
 
@@ -50,43 +105,42 @@ window.onload = function() {
         game.load.image('butterfly', 'assets/butterfly.png');
         game.load.image('pencil', 'assets/pencil.png');
         game.load.image('ribs', 'assets/rib.png');
+        game.load.image('greennose', 'assets/greennose.png');
+        game.load.image('rednose', 'assets/rednose.png');
 
         game.load.audio('correct', 'assets/audio/gmae.wav');
-        game.load.audio('wrong', 'assets/audio/meow2.mp3');
-        game.load.audio('correct', 'assets/audio/Wii Shop Channel Music.mp3');
+        game.load.audio('wrong', 'assets/audio/SoundEffects/shot1.wav');
+        game.load.audio('music', 'assets/audio/Wii Shop Channel Music.mp3');
     }
-
-    // Image variables
-    var heart;
-    var heart2;
-    var bone;
-    var bone2;
-    var apple;
-    var apple2;
-    var icecream;
-    var icecream2;
-    var wishbone;
-    var wishbone2;
-    var ribs;
-    var ribs2;
-    var butterfly;
-    var butterfly2;
-    var pencil;
-    var pencil2;
-    var bread;
-    var bread2;
-    var horse;
-    var horse2;
-
-    //background image
-    var operation;
-
 
     function create() {
 
         operation = game.add.sprite(0, 0, 'operationBoard');
         operation.width = width;
         operation.height = height-100;
+
+        var i = 0;
+        var x = 0;
+        var newNumFound = false;
+        var allDifferent = false
+        for(i = 0; i < xLocation.length; i+=2){
+            while(newNumFound == false){
+                var rand = game.rnd.integerInRange(0, 19);
+                for(x = 0; x < xLocation.length; x+=2){
+                    if(rand == xRandom[x+1] || rand%2===0){
+                        allDifferent = false;
+                        break;
+                    }else{
+                        allDifferent = true;
+                    }
+                }
+                if(allDifferent){
+                    newNumFound = true;
+                }
+            }
+            xRandom[i+1] = rand;
+            newNumFound = false;
+        }
 
         //Sounds
         correct = game.add.audio('correct');
@@ -96,25 +150,25 @@ window.onload = function() {
 
         // Setting the images
         heart = game.add.sprite(xLocation[0], yLocation[0], 'cardBack');
-        heart2 = game.add.sprite(xLocation[1], yLocation[1], 'cardBack');
+        heart2 = game.add.sprite(xLocation[xRandom[1]], yLocation[xRandom[1]], 'cardBack');
         bone = game.add.sprite(xLocation[2], yLocation[2], 'cardBack');
-        bone2 = game.add.sprite(xLocation[3], yLocation[3], 'cardBack');
+        bone2 = game.add.sprite(xLocation[xRandom[3]], yLocation[xRandom[3]], 'cardBack');
         apple = game.add.sprite(xLocation[4], yLocation[4], 'cardBack');
-        apple2 = game.add.sprite(xLocation[5], yLocation[5], 'cardBack');
+        apple2 = game.add.sprite(xLocation[xRandom[5]], yLocation[xRandom[5]], 'cardBack');
         icecream = game.add.sprite(xLocation[6], yLocation[6], 'cardBack');
-        icecream2 = game.add.sprite(xLocation[7], yLocation[7], 'cardBack');
+        icecream2 = game.add.sprite(xLocation[xRandom[7]], yLocation[xRandom[7]], 'cardBack');
         wishbone = game.add.sprite(xLocation[8], yLocation[8], 'cardBack');
-        wishbone2 = game.add.sprite(xLocation[9], yLocation[9], 'cardBack');
+        wishbone2 = game.add.sprite(xLocation[xRandom[9]], yLocation[xRandom[9]], 'cardBack');
         ribs = game.add.sprite(xLocation[10], yLocation[10], 'cardBack');
-        ribs2 = game.add.sprite(xLocation[11], yLocation[11], 'cardBack');
+        ribs2 = game.add.sprite(xLocation[xRandom[11]], yLocation[xRandom[11]], 'cardBack');
         butterfly = game.add.sprite(xLocation[12], yLocation[12], 'cardBack');
-        butterfly2 = game.add.sprite(xLocation[13], yLocation[13], 'cardBack');
+        butterfly2 = game.add.sprite(xLocation[xRandom[13]], yLocation[xRandom[13]], 'cardBack');
         pencil = game.add.sprite(xLocation[14], yLocation[14], 'cardBack');
-        pencil2 = game.add.sprite(xLocation[15], yLocation[15], 'cardBack');
+        pencil2 = game.add.sprite(xLocation[xRandom[15]], yLocation[xRandom[15]], 'cardBack');
         bread = game.add.sprite(xLocation[16], yLocation[16], 'cardBack');
-        bread2 = game.add.sprite(xLocation[17], yLocation[17], 'cardBack');
+        bread2 = game.add.sprite(xLocation[xRandom[17]], yLocation[xRandom[17]], 'cardBack');
         horse = game.add.sprite(xLocation[18], yLocation[18], 'cardBack');
-        horse2 = game.add.sprite(xLocation[19], yLocation[19], 'cardBack');
+        horse2 = game.add.sprite(xLocation[xRandom[19]], yLocation[xRandom[19]], 'cardBack');
         
         //Allowing images to be clicked
         heart.inputEnabled = true;
@@ -159,17 +213,35 @@ window.onload = function() {
         bread2.events.onInputDown.add(listener, this);
         horse.events.onInputDown.add(listener, this);
         horse2.events.onInputDown.add(listener, this);
+
+        livesString = 'Attempts : ';
+        livesText = game.add.text(width-150, 175, livesString + lives, { font: '25px Arial', fill: '#000' });
+
+        stateText = game.add.text(200,125,' ', { font: '30px Arial', fill: '#000' });
+        stateText.anchor.setTo(0.5, 0.5);
+        stateText.visible = false;
     }
 
     function listener() {
-        // Setting the mouse x and y position
-        var clickX = game.input.mousePointer.x;
-        var clickY = game.input.mousePointer.y;
-        cardsClicked++;
-        checkCard(clickX, clickY);
-        if(cardsClicked === 2){
-            cardsClicked = 0;
-            checkMatch();
+        if(gameEnded === false){
+            // Setting the mouse x and y position
+            var clickX = game.input.mousePointer.x;
+            var clickY = game.input.mousePointer.y;
+            cardsClicked++;
+            if(cardsClicked === 1){
+                firstPicked = true;
+                secondPicked = false
+            }
+            if(cardsClicked === 2){
+                firstPicked = false;
+                secondPicked = true;
+            }
+            checkCard(clickX, clickY);
+            if(cardsClicked === 2){
+                firstPicked = false;
+                cardsClicked = 0;
+                checkMatch();
+            }
         }
     }
 
@@ -179,7 +251,15 @@ window.onload = function() {
         for(count = 0; count < xLocation.length; count++){
             if(xLocation[count] <= clickX && clickX <= xLocation[count]+imageWidth && yLocation[count] <= clickY && clickY <= yLocation[count]+imageHeight){
                 checker = count;
-                flipCard(checker);
+                if(firstPicked && checker%2===1){
+                    cardsClicked = 0;
+                    firstPicked = false;
+                }else if(secondPicked && checker%2===0){
+                    cardsClicked = 1;
+                    secondPicked = false;
+                }else{
+                    flipCard(checker);
+                }
                 break;
             }
         }
@@ -188,49 +268,89 @@ window.onload = function() {
     function checkMatch(){
         // function to see if a match was found when two cards were clicked
         var i;
-        for(i = 0; i < clicked.length; i+=2){
-            // If a match is found
-            if(clicked[i] === 1 && clicked[i+1] === 1){
-                // Order of card name in array
-                // HEART, FUNNY BONE, ADAMS APPLE, BRAIN FREEZE, WISH BONE, SPARE RIBS, BUTTERFLIES, WRITERS CRAMP, BREAD BASKET, CHARLIE HORSE//matchFound();
-                if(i === 0){
-                    heart.inputEnabled = false;
-                    heart2.inputEnabled = false;
-                }else if(i === 2){
-                    bone.inputEnabled = false;
-                    bone2.inputEnabled = false;
-                }else if(i === 4){
-                    apple.inputEnabled = false;
-                    apple2.inputEnabled = false;
-                }else if(i === 6){
-                    icecream.inputEnabled = false;
-                    icecream2.inputEnabled = false;
-                }else if(i === 8){
-                    wishbone.inputEnabled = false;
-                    wishbone2.inputEnabled = false;
-                }else if(i === 10){
-                    ribs.inputEnabled = false;
-                    ribs2.inputEnabled = false;
-                }else if(i === 12){
-                    butterfly.inputEnabled = false;
-                    butterfly2.inputEnabled = false;
-                }else if(i === 14){
-                    pencil.inputEnabled = false;
-                    pencil2.inputEnabled = false;
-                }else if(i === 16){
-                    bread.inputEnabled = false;
-                    bread2.inputEnabled = false;
-                }else if(i === 18){
-                    horse.inputEnabled = false;
-                    horse2.inputEnabled = false;
-                }
-            }else{
-                // Set the cards back to the cardBack image
-                clicked[i] = 0;
-                clicked[i+1] = 0;
-                game.add.sprite(xLocation[i], yLocation[i], 'cardBack');
-                game.add.sprite(xLocation[i+1], yLocation[i+1], 'cardBack');
+
+        //NEED TO DEAL WITH THIS IF STATEMENT because ^^^^ this is checking when the cards used to be next to each other in the array, now they are seperated due to the randomness
+        if(clicked[totalClick[1]] === 1 && clicked[temp2-1] === 1){
+            correct.play();
+            // Order of card name in array
+            // HEART, FUNNY BONE, ADAMS APPLE, BRAIN FREEZE, WISH BONE, SPARE RIBS, BUTTERFLIES, WRITERS CRAMP, BREAD BASKET, CHARLIE HORSE//matchFound();
+            if(clicked[0] === 1 && clicked[totalClick[1]] === 1){
+                heart.inputEnabled = false;
+                heart2.inputEnabled = false;
+            }else if(clicked[2] === 1 && clicked[totalClick[1]] === 1){
+                bone.inputEnabled = false;
+                bone2.inputEnabled = false;
+            }else if(clicked[4] === 1 && clicked[totalClick[1]] === 1){
+                apple.inputEnabled = false;
+                apple2.inputEnabled = false;
+            }else if(clicked[6] === 1 && clicked[totalClick[1]] === 1){;
+                icecream.inputEnabled = false;
+                icecream2.inputEnabled = false;
+            }else if(clicked[8] === 1 && clicked[totalClick[1]] === 1){
+                wishbone.inputEnabled = false;
+                wishbone2.inputEnabled = false;
+            }else if(clicked[10] === 1 && clicked[totalClick[1]] === 1){
+                ribs.inputEnabled = false;
+                ribs2.inputEnabled = false;
+            }else if(clicked[12] === 1 && clicked[totalClick[1]] === 1){
+                butterfly.inputEnabled = false;
+                butterfly2.inputEnabled = false;
+            }else if(clicked[14] === 1 && clicked[totalClick[1]] === 1){
+                pencil.inputEnabled = false;
+                pencil2.inputEnabled = false;
+            }else if(clicked[16] === 1 && clicked[totalClick[1]] === 1){
+                bread.inputEnabled = false;
+                bread2.inputEnabled = false;
+            }else if(clicked[18] === 1 && clicked[totalClick[1]] === 1){
+                horse.inputEnabled = false;
+                horse2.inputEnabled = false;
             }
+            nose = game.add.sprite(190, 110, 'greennose');
+            matched++;
+            if(matched === 10){
+                gameEnded = true;
+                stateText.text = "The surgery was a success!!\n           Refresh to try again"
+                stateText.visible = true;
+                //game.input.onTap.addOnce(restart,this);
+            }
+        }else{
+            wrong.play();
+            nose = game.add.sprite(190, 110, 'rednose');
+            lives--;
+            livesText.text = livesString + lives;
+            // believe these are okay, dont need to edit these four lines
+            clicked[totalClick[0]] = 0;
+            clicked[totalClick[1]] = 0;
+            game.add.sprite(xLocation[totalClick[0]], yLocation[totalClick[0]], 'cardBack');
+            game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'cardBack');
+            if(totalClick[1] === xRandom[1]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'heart');
+            }else if(totalClick[1] === xRandom[3]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'bone');
+            }else if(totalClick[1] === xRandom[5]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'apple');
+            }else if(totalClick[1] === xRandom[7]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'icecream');
+            }else if(totalClick[1] === xRandom[9]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'wishbone');
+            }else if(totalClick[1] === xRandom[11]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'ribs');
+            }else if(totalClick[1] === xRandom[13]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'butterfly');
+            }else if(totalClick[1] === xRandom[15]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'pencil');
+            }else if(totalClick[1] === xRandom[17]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'bread');
+            }else if(totalClick[1] === xRandom[19]){
+                tempPic = game.add.sprite(xLocation[totalClick[1]], yLocation[totalClick[1]], 'horse');
+            }
+        }
+        game.time.events.add(Phaser.Timer.SECOND * 1, fadePicture, this);
+        if(lives === 0){
+            gameEnded = true;
+            stateText.text = "The surgery was unsuccessful!\n           Refresh to try again"
+            stateText.visible = true;
+            //game.input.onTap.addOnce(restart,this);
         }
     }
 
@@ -238,46 +358,67 @@ window.onload = function() {
         // Change the card from the back of the card to the face of the card.
         if(checker1 === 0){
             heart = game.add.sprite(xLocation[checker1], yLocation[checker1], 'heart');
-        }else if(checker1 === 1){
+        }else if(checker1 === xRandom[1]){
+            temp2 = 1;
             heart2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'heart');
         }else if(checker1 === 2){
             bone = game.add.sprite(xLocation[checker1], yLocation[checker1], 'bone');
-        }else if(checker1 === 3){
+        }else if(checker1 === xRandom[3]){
+            temp2 = 3;
             bone2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'bone');
         }else if(checker1 === 4){
             apple = game.add.sprite(xLocation[checker1], yLocation[checker1], 'apple');
-        }else if(checker1 === 5){
+        }else if(checker1 === xRandom[5]){
+            temp2 = 5;
             apple2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'apple');
         }else if(checker1 === 6){
             icecream = game.add.sprite(xLocation[checker1], yLocation[checker1], 'icecream');
-        }else if(checker1 === 7){
+        }else if(checker1 === xRandom[7]){
+            temp2 = 7;
             icecream2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'icecream');
         }else if(checker1 === 8){
             wishbone = game.add.sprite(xLocation[checker1], yLocation[checker1], 'wishbone');
-        }else if(checker1 === 9){
+        }else if(checker1 === xRandom[9]){
+            temp2 = 9;
             wishbone2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'wishbone');
         }else if(checker1 === 10){
             ribs = game.add.sprite(xLocation[checker1], yLocation[checker1], 'ribs');
-        }else if(checker1 === 11){
+        }else if(checker1 === xRandom[11]){
+            temp2 = 11;
             ribs2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'ribs');
         }else if(checker1 === 12){
             butterfly = game.add.sprite(xLocation[checker1], yLocation[checker1], 'butterfly');
-        }else if(checker1 === 13){
+        }else if(checker1 === xRandom[13]){
+            temp2 = 13;
             butterfly2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'butterfly');
         }else if(checker1 === 14){
             pencil = game.add.sprite(xLocation[checker1], yLocation[checker1], 'pencil');
-        }else if(checker1 === 15){
+        }else if(checker1 === xRandom[15]){
+            temp2 = 15;
             pencil2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'pencil');
         }else if(checker1 === 16){
             bread = game.add.sprite(xLocation[checker1], yLocation[checker1], 'bread');
-        }else if(checker1 === 17){
+        }else if(checker1 === xRandom[17]){
+            temp2 = 17;
             bread2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'bread');
         }else if(checker1 === 18){
             horse = game.add.sprite(xLocation[checker1], yLocation[checker1], 'horse');
-        }else if(checker1 === 19){
+        }else if(checker1 === xRandom[19]){
+            temp2 = 19;
             horse2 = game.add.sprite(xLocation[checker1], yLocation[checker1], 'horse');
         }
         clicked[checker1] = 1;
+        if(cardsClicked === 1){
+            totalClick[0] = checker1;
+        }
+        if(cardsClicked === 2){
+            totalClick[1] = checker1;
+        }
+    }
+
+    function fadePicture() {
+        game.add.tween(nose).to( { alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
+        game.add.tween(tempPic).to( { alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
     }
 
     function update() {
@@ -288,3 +429,6 @@ window.onload = function() {
         //game.debug.text('x-pos: ' + game.input.mousePointer.x, 32, 32);
     }
 };
+
+
+
