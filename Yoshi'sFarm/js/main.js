@@ -28,7 +28,7 @@ window.onload = function() {
     var mount;
     var happy;
 
-    var stateText
+    var stateText;
 
     var eggsCollected = 0;
     var game = new Phaser.Game(width, height, Phaser.CANVAS, 'game', { preload: preload, create: create, update: update, render: render });
