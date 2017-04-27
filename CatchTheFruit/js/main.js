@@ -24,8 +24,8 @@ window.onload = function() {
     // may not need the trashalive variable
 
     "use strict";
-    var width = 800;
-    var height = 400;
+    var width = 400;
+    var height = 600;
     var background;
     var timer;
 
@@ -39,8 +39,8 @@ window.onload = function() {
     var bag;
 
     //spawn locations for trash
-    var yLoc = -30; //spawn before the screen so it slowly comes onto screen
-    var xLoc = [30, 90, 150, 220, 290, 360, 420, 490, 560, 630, 690, 750];
+    var yLoc = -80; //spawn before the screen so it slowly comes onto screen
+    var xLoc = [20, 40, 60, 80, 100, 120, 140, 180, 220, 260, 300, 325];
     var trash;// array to hold the different types of trash
     var trashSpots; // array to hold the trash for each 12 lanes
     var counter = 0; // counter to use for for loops
@@ -53,7 +53,7 @@ window.onload = function() {
     var moveTrash = [0,0,0,0,0,0,0,0,0,0,0,0];
     var trashSpawned = 0;
     var trashExist = 12;
-    //0 = can, 1 = rope, 2 = bottle, 3 = bag, 4 = radio
+    //0 = can, 1 = rope, 2 = bottle, 3 = bag, 4 = radio, 5 = badfruit;
     var trashType = [0,0,0,0,0,0,0,0,0,0,0,0];
 
     var scoreString;
@@ -62,7 +62,7 @@ window.onload = function() {
 
     var livesString;
     var livesText;
-    var lives = 10;
+    var lives = 3;
 
     var trashString
     var trashText;
@@ -78,46 +78,65 @@ window.onload = function() {
 
     var gameEnded = false;
 
+    var fruitCollected = 0;
+
     var game = new Phaser.Game(width, height, Phaser.CANVAS, 'game', { preload: preload, create: create, update: update, render: render });
     
     function preload() {
         //game.load.image('background', 'assets/river3.png');
-        game.load.image('can', 'assets/can.png');
-        game.load.image('radio', 'assets/radio2.png');
-        game.load.image('rope', 'assets/rope.png');
-        game.load.image('bottle', 'assets/bottle.png');
-        game.load.image('bag', 'assets/bag.png');
-        game.load.image('boardwalk', 'assets/boardwalk2.png');
+        game.load.image('apple', 'assets/apple.png');
+        game.load.image('watermelon', 'assets/watermelon.png');
+        game.load.image('peach', 'assets/peach.png');
+        game.load.image('orange', 'assets/orange.png');
+        game.load.image('grape', 'assets/grape.png');
+        game.load.image('banana', 'assets/banana.png');
+        game.load.image('coconut', 'assets/coconut.png');
+        game.load.image('badfruit', 'assets/badfruit.png');
+        game.load.image('box', 'assets/box.png');
+        game.load.image('pitcher', 'assets/pitcher.png');
+        game.load.image('carton', 'assets/carton.png');
+        game.load.image('background', 'assets/acbackground.jpg');
         //Sounds
-        game.load.audio('pickup', 'assets/audio/SoundEffects/numkey.wav');
-        game.load.audio('level', 'assets/audio/SoundEffects/p-ping.mp3');
-        game.load.audio('trashLeft', 'assets/audio/SoundEffects/shot1.wav');
+        //game.load.audio('pickup', 'assets/audio/SoundEffects/numkey.wav');
+        //game.load.audio('level', 'assets/audio/SoundEffects/p-ping.mp3');
+        //game.load.audio('trashLeft', 'assets/audio/SoundEffects/shot1.wav');
         //game.load.audio('music', 'assets/audio/CatAstroPhi_shmup_normal.wav');
-        game.load.audio('music', 'assets/audio/oedipus_wizball_highscore.mp3');
+        //game.load.audio('music', 'assets/audio/oedipus_wizball_highscore.mp3');
     }
+
+    var player;
+    var playerX = width/2;
+    var kiwi1, kiwi2, kiwi3;
 
     function create() {
 
         //game.stage.backgroundColor = "#0a8906";
 
         // Setting the images
-        background = game.add.sprite(0, 0, 'background');
-        background.width = width;
+        //background = game.add.sprite(0, 0, 'background');
+        //background.width = width;
 
         //Sounds
-        pickup = game.add.audio('pickup');
-        level = game.add.audio('level');
-        trashLeft = game.add.audio('trashLeft');
-        music = game.add.audio('music');
-        music.play();
+        //pickup = game.add.audio('pickup');
+        //level = game.add.audio('level');
+        //trashLeft = game.add.audio('trashLeft');
+        //music = game.add.audio('music');
+        //music.play();
+        game.add.sprite(0, 0, 'background');
+        game.add.sprite(10, 60, 'pitcher');
+        kiwi1 = game.add.sprite(width - 60, 10, 'carton');
+        kiwi2 = game.add.sprite(width - 60, 90, 'carton');
+        kiwi3 = game.add.sprite(width - 60, 170, 'carton');
+        player = game.add.sprite(playerX, height-100, 'box');
+        //game.stage.backgroundColor="#22cc58";
 
-        can = game.add.sprite(xLoc[0], yLoc, 'can');
-        trash = ['can', 'rope', 'bottle', 'bag', 'radio'];
+        can = game.add.sprite(xLoc[0], yLoc, 'apple');
+        trash = ['apple', 'watermelon', 'peach', 'orange', 'grape', 'banana', 'coconut', 'badfruit'];
         trashSpots = [can,can,can,can,can,can,can,can,can,can,can,can];
 
         //Timer for spawning trash
         timer = game.time.create(false);
-        timer.loop(1000, spawnTrash, this);
+        timer.loop(500, spawnTrash, this);
         timer.start();
 
         //Scores
@@ -127,16 +146,16 @@ window.onload = function() {
         livesString = 'Lives : ';
         livesText = game.add.text(670, 10, livesString + lives, { font: '30px Arial', fill: '#fff' });
 
-        trashString = 'Trash Collected : ';
-        trashText = game.add.text(660, 60, trashString + trashC, { font: '15px Arial', fill: '#fff' });
+        trashString = 'X ';
+        trashText = game.add.text(75, 80, trashString + trashC, { font: '30px Arial', fill: '#fff' });
 
-        stateText = game.add.text(400,200,' ', { font: '50px Arial', fill: '#fff' });
+        stateText = game.add.text(210,300,' ', { font: '50px Arial', fill: '#fff' });
         stateText.anchor.setTo(0.5, 0.5);
         stateText.visible = false;
     }
 
     function setTrash(randX){
-        var trashChoice = game.rnd.integerInRange(0, 4);
+        var trashChoice = game.rnd.integerInRange(0, 7);
         trashType[randX] = trashChoice;
         currentSprite = game.add.sprite(xLoc[randX], yLoc, trash[trashChoice]);
         currentSprite.inputEnabled = true;
@@ -252,17 +271,19 @@ window.onload = function() {
 
         if(clicked){
             //play sound
-            pickup.play();
+            //pickup.play();
             trashC++;
             trashText.text = trashString + trashC;
             if(trashC%10 === 0){
                 //play another sound
-                level.play();
+                //level.play();
             }
         }
     }*/
 
     function spawnTrash(){
+        player.destroy();
+        player = game.add.sprite(playerX, height-100, 'box');
         if(gameEnded === false){
             var i;
             var chosen = false;
@@ -276,15 +297,71 @@ window.onload = function() {
                 }
             }
         }
+        /*for(i = 0; i < trashSpots.length; i++){
+            if(trashSpots[i].y >= player.y && trashSpots[i].y+60 <= player.y+69 && trashSpots[i].x >= player.x && trashSpots[i].x+50 <= player.x+96){
+                trashSpots[i].destroy();
+                trashAlive[i] = 0;
+                trashExist-=1;
+                moveTrash[i] = 0;
+                score += 20;
+                scoreText.text = scoreString + score;
+                if(trashType[i] === 7){
+                    score-=100;
+                    scoreText.text = scoreString + score;
+                }
+            }
+        }*/
     }
 
+    var missed = 0;
+
     function update() {
+        player.x = game.input.mousePointer.x-45;
+        if(player.x > width-100){
+            player.x = width-100;
+        }else if(player.x < 5){
+            player.x = 5;
+        }
         if(gameEnded === false){
             var i;
             for(i = 0; i < trashSpots.length; i++){
+                //var fruitCenter = xLoc[i]+20;
                 //move trash if chosen
                 if(moveTrash[i] === 1){
-                    if(trashType[i] === 0){
+                    if(trashSpots[i].y >= player.y-10 && trashSpots[i].y+30 <= player.y+69 && trashSpots[i].x >= player.x && trashSpots[i].x+50 <= player.x+96){
+                        trashSpots[i].destroy();
+                        trashAlive[i] = 0;
+                        trashExist-=1;
+                        moveTrash[i] = 0;
+                        score += 20;
+                        fruitCollected++;
+                        scoreText.text = scoreString + score;
+                        //checker to see if the player caught the bad fruit, should end game
+                        if(trashType[i] === 7){
+                            gameEnded = true;
+                            stateText.text="  You caught the\n    bad fruit! \nClick to try again";
+                            stateText.visible = true;
+                            var i;
+                            for(i = 0; i < trashCount; i++){
+                                //trashCount[i].destroy();
+                                trashSpots[i].destroy();
+                                trashAlive[i] = 0;
+                                moveTrash[i] = 0;
+                            }
+                            game.input.onTap.addOnce(restart,this);
+                            break;
+                            //score-=100;
+                            //scoreText.text = scoreString + score;
+                        }
+                        if(fruitCollected%10 === 0){
+                            //play a sound
+                            trashC++;
+                            trashText.text = trashString + trashC;
+                        }
+                    }
+                }
+                if(moveTrash[i] === 1){
+                    /*if(trashType[i] === 0){
                         trashSpots[i].y+=.5;
                     }else if(trashType[i] === 1){
                         trashSpots[i].y+=1;
@@ -294,7 +371,8 @@ window.onload = function() {
                         trashSpots[i].y+=2;
                     }else if(trashType[i] === 4){
                         trashSpots[i].y+=3;
-                    }
+                    }*/
+                    trashSpots[i].y+=4;
                 }
                 //destroy trash
                 if(trashSpots[i].y > height && trashAlive[i] === 1){
@@ -302,14 +380,29 @@ window.onload = function() {
                     trashAlive[i] = 0;
                     trashExist-=1;
                     moveTrash[i] = 0;
-                    lives--;
-                    livesText.text = livesString + lives;
-                    trashLeft.play();
+                    
+                    //livesText.text = livesString + lives;
+                    // checker for if a good fruit passes the player
+                    if(trashType[i] !== 7){
+                        lives--;
+                        missed++;
+                        if(missed === 1){
+                            kiwi3.destroy();
+                            //kiwi3.kill();
+                        }else if(missed === 2){
+                            kiwi2.destroy();
+                        }else if(missed === 3){
+                            kiwi1.destroy();
+                        }
+                    }   
+                    //lives--;
+                    //trashLeft.play();
                 }
 
+                //End the game
                 if(lives === 0){
                     gameEnded = true;
-                    stateText.text=" The river became\ntoo contaminated! \n Click to try again";
+                    stateText.text=" You dropped too\nmany ingredients! \n Click to try again";
                     stateText.visible = true;
                     var i;
                     for(i = 0; i < trashCount; i++){
@@ -328,35 +421,15 @@ window.onload = function() {
         gameEnded = false;
         score = 0;
         scoreText.text = scoreString + score;
-        lives = 10;
+        lives = 3;
         trashC = 0;
         trashText.text = trashString + trashC;
         livesText.text = livesString + lives;
         stateText.visible = false;
-        /*for(var x = 0; x < enemyCount; x++){
-            enemyKilled[x] = 0;
-        }
-
-        //reset sprites and reset
-        player.destroy();
-        enemy1.destroy();
-        enemy2.destroy();
-        enemy3.destroy();
-        enemy4.destroy();
-        enemy5.destroy();
-
-        enemy1 = game.add.sprite(enemyPosX[0], enemyPosY[0], 'enemy');
-        enemy2 = game.add.sprite(enemyPosX[1], enemyPosY[1], 'enemy');
-        enemy3 = game.add.sprite(enemyPosX[2], enemyPosY[2], 'enemy');
-        enemy4 = game.add.sprite(enemyPosX[3], enemyPosY[3], 'enemy');
-        enemy5 = game.add.sprite(enemyPosX[4], enemyPosY[4], 'enemy');
-        enemies = [enemy1, enemy2, enemy3, enemy4, enemy5];
-        enemyDir = 1;
-
-        player = game.add.sprite(50, 50, 'ninjaD');
-        player.width = 50;
-        player.height = 50;
-        stateText.visible = false;*/
+        kiwi1 = game.add.sprite(width - 60, 10, 'carton');
+        kiwi2 = game.add.sprite(width - 60, 90, 'carton');
+        kiwi3 = game.add.sprite(width - 60, 170, 'carton');
+        missed = 0;
     }
 
     function render() {
