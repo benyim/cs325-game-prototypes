@@ -338,6 +338,9 @@ window.onload = function() {
                         scoreText.text = scoreString + score;
                         //checker to see if the player caught the bad fruit, should end game
                         if(trashType[i] === 7){
+                            kiwi3.destroy();
+                            kiwi2.destroy();
+                            kiwi1.destroy();
                             gameEnded = true;
                             stateText.text="  You caught the\n    bad fruit! \nClick to try again";
                             stateText.visible = true;
